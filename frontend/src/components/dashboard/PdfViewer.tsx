@@ -54,7 +54,7 @@ export function PdfViewer({ file, onClose, onNext, onPrev, currentIndex, totalIt
                 setNumPages(pdfDoc.numPages);
                 setLoading(false);
             },
-            (err) => {
+            (_err) => {
                 if (cancelled) return;
                 setError("Failed to load PDF document.");
                 setLoading(false);

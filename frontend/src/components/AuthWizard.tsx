@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Key, Lock, ArrowRight, Settings, ShieldCheck, Sun, Moon, HelpCircle, ExternalLink, X, Heart } from "lucide-react";
+import { Phone, Key, Lock, ArrowRight, Settings, Sun, Moon, HelpCircle, ExternalLink, X, Heart } from "lucide-react";
 import { useTheme } from '../context/ThemeContext';
 import { api } from '../api';
 
@@ -113,7 +113,7 @@ export function AuthWizard({ onLogin }: { onLogin: () => void }) {
         setLoading(true);
         setError(null);
         try {
-            const res = await api.signIn(code);
+            const res: any = await api.signIn(code);
             if (res.success) {
                 onLogin();
             } else if (res.next_step === "password") {
@@ -133,7 +133,7 @@ export function AuthWizard({ onLogin }: { onLogin: () => void }) {
         setLoading(true);
         setError(null);
         try {
-            const res = await api.checkPassword(password);
+            const res: any = await api.checkPassword(password);
             if (res.success) {
                 onLogin();
             } else {
@@ -146,9 +146,7 @@ export function AuthWizard({ onLogin }: { onLogin: () => void }) {
         }
     };
 
-    const openExternal = (url: string) => {
-        window.open(url, '_blank');
-    };
+    // removed unused openExternal
 
     return (
         <div className="h-full w-full auth-gradient flex items-center justify-center p-6 relative">

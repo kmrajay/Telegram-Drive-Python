@@ -34,6 +34,7 @@ class CheckPasswordRequest(BaseModel):
 
 class ConnectRequest(BaseModel):
     api_id: int
+    api_hash: Optional[str] = None
 
 
 # ── File Models ──────────────────────────────────────────────────────

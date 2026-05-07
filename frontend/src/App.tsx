@@ -5,6 +5,7 @@ import { AuthWizard } from './components/AuthWizard';
 import { Dashboard } from './components/Dashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ThemeProvider } from './context/ThemeContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -46,7 +47,9 @@ export default function App() {
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
-                    <AppContent />
+                    <ConfirmProvider>
+                        <AppContent />
+                    </ConfirmProvider>
                 </ThemeProvider>
             </QueryClientProvider>
         </ErrorBoundary>

@@ -44,11 +44,12 @@ export function useTelegramConnection(onLogoutParent: () => void) {
                 const savedActiveFolderId = localStore.get<number | null>('activeFolderId');
                 if (savedActiveFolderId !== null) setActiveFolderId(savedActiveFolderId);
 
-                const apiIdStr = localStore.get<string>('api_id');
-                if (apiIdStr) {
+                const savedApiHash = localStore.get<string>('api_hash');
+                const savedApiId = localStore.get<string>('api_id');
+                if (savedApiId) {
                     try {
-                        const apiId = parseInt(apiIdStr);
-                        await api.connect(apiId);
+                        const apiId = parseInt(savedApiId);
+                        await api.connect(apiId, savedApiHash || undefined);
                         setIsConnected(true);
                         queryClient.invalidateQueries({ queryKey: ['files'] });
                     } catch {

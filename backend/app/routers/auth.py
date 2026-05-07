@@ -32,6 +32,8 @@ log = logging.getLogger(__name__)
 async def connect(req: ConnectRequest):
     """Initialize the Telegram client with the given API ID."""
     app_state.api_id = req.api_id
+    if req.api_hash:
+        app_state.api_hash = req.api_hash
 
     if app_state.client is not None and app_state.client.is_connected():
         return {"connected": True}
@@ -93,35 +95,57 @@ async def request_code(req: RequestCodeRequest):
     app_state.api_id = req.api_id
     app_state.api_hash = req.api_hash
 
-    # Ensure client exists
-    if app_state.client is None or not app_state.client.is_connected():
+    # Disconnect any existing client first
+    if app_state.client is not None:
         try:
-            client = TelegramClient(
-                str(SESSION_PATH),
-                req.api_id,
-                req.api_hash,
-            )
-            await client.connect()
-            app_state.client = client
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            await app_state.client.disconnect()
+        except Exception:
+            pass
+        app_state.client = None
 
+    # Create fresh client and connect
     try:
-        result = await app_state.client.send_code_request(req.phone)
+        client = TelegramClient(
+            str(SESSION_PATH),
+            req.api_id,
+            req.api_hash,
+        )
+        await client.connect()
+        app_state.client = client
+        log.info("Created and connected Telegram client for api_id=%s", req.api_id)
+    except Exception as e:
+        log.error("Failed to connect Telegram client: %s", e)
+        raise HTTPException(status_code=500, detail=f"Connection failed: {e}")
+
+    # Check if already logged in
+    try:
+        me = await client.get_me()
+        if me:
+            log.info("Already logged in as %s", getattr(me, 'first_name', 'user'))
+            return {"status": "already_logged_in"}
+    except Exception:
+        pass  # Not logged in, continue with code request
+
+    # Send code request
+    try:
+        result = await client.send_code_request(req.phone)
         app_state.phone_code_hash = result.phone_code_hash
         app_state.phone = req.phone
         log.info("Code requested for %s", req.phone)
         return {"status": "code_sent"}
-    except (AuthRestartError, FloodWaitError) as e:
-        # Retry once for AUTH_RESTART
+    except FloodWaitError as e:
+        raise HTTPException(status_code=429, detail=f"FLOOD_WAIT_{e.seconds}")
+    except AuthRestartError:
+        # Retry once
         try:
-            result = await app_state.client.send_code_request(req.phone)
+            result = await client.send_code_request(req.phone)
             app_state.phone_code_hash = result.phone_code_hash
             app_state.phone = req.phone
             return {"status": "code_sent"}
         except Exception as e2:
             raise HTTPException(status_code=500, detail=str(e2))
     except Exception as e:
+        log.error("Code request failed: %s", e)
         raise HTTPException(status_code=500, detail=_map_error(e))
 
 

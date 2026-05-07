@@ -6,8 +6,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from .dependencies import DATA_DIR, BANDWIDTH_LIMIT_BYTES
-from .models import BandwidthStats
+from ..dependencies import DATA_DIR, BANDWIDTH_LIMIT_BYTES
+from ..models import BandwidthStats
 
 
 class BandwidthManager:

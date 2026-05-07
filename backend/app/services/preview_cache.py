@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from .bandwidth import bw_manager
+from .bandwidth import bw_manager  # noqa: F401 — used by routers
 from ..dependencies import CACHE_DIR, THUMB_DIR
 
 PREVIEW_CACHE_MAX_FILES = 30

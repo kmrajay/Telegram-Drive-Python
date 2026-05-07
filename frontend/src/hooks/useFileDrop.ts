@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, DragEvent } from 'react';
+import { useState, useCallback, DragEvent } from 'react';
 
 export function useFileDrop() {
     const [isDragging, setIsDragging] = useState(false);

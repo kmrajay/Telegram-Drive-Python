@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-
 /**
  * Check for app updates.
  * In the Python web version, we skip auto-update and always report no update available.

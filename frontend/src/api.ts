@@ -3,8 +3,6 @@
  * Replaces all Tauri invoke() calls with fetch() to the FastAPI server.
  */
 
-const API_BASE = '';  // Same origin in production; proxied in dev
-
 export async function apiGet<T>(path: string, params?: Record<string, string | number | null>): Promise<T> {
     const url = new URL(path, window.location.origin);
     if (params) {
@@ -67,11 +65,11 @@ export async function apiUpload(path: string, file: File, folderId: number | nul
 
 // ── Typed API wrappers (replacing Tauri invoke calls) ─────────────
 
-import type { TelegramFile, TelegramFolder, BandwidthStats } from '../types';
+import type { TelegramFile, TelegramFolder, BandwidthStats } from './types';
 
 export const api = {
     // Auth
-    connect: (apiId: number) => apiPost('/api/connect', { api_id: apiId }),
+    connect: (apiId: number, apiHash?: string) => apiPost('/api/connect', { api_id: apiId, api_hash: apiHash }),
     checkConnection: () => apiGet<{ connected: boolean }>('/api/connection/status'),
     requestCode: (phone: string, apiId: number, apiHash: string) =>
         apiPost('/api/auth/request-code', { phone, api_id: apiId, api_hash: apiHash }),

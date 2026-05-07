@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { TelegramFile, BandwidthStats } from '../types';
+import { TelegramFile } from '../types';
 import { formatBytes, isMediaFile, isPdfFile } from '../utils';
 import { api } from '../api';
 
@@ -52,7 +52,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         _setInternalDragFileId(id);
     };
     const [playingFile, setPlayingFile] = useState<TelegramFile | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDragging, _setIsDragging] = useState(false);
     const [pdfFile, setPdfFile] = useState<TelegramFile | null>(null);
     const [previewContextFiles, setPreviewContextFiles] = useState<TelegramFile[]>([]);
     const [previewContextIndex, setPreviewContextIndex] = useState(-1);
@@ -100,28 +100,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
         if (selectedIds.length > 0) handleBulkDelete();
     }, [selectedIds, handleBulkDelete]);
 
-    const handleEscape = useCallback(() => {
-        setSelectedIds([]);
-        setSearchTerm("");
-        setPreviewFile(null);
-        setPlayingFile(null);
-        setPdfFile(null);
-    }, []);
-
-    const handleFocusSearch = useCallback(() => {
-        const searchInput = document.querySelector('input[placeholder="Search files..."]') as HTMLInputElement;
-        if (searchInput) { searchInput.focus(); searchInput.select(); }
-    }, []);
-
-    const handleEnter = useCallback(() => {
-        if (selectedIds.length === 1) {
-            const selected = displayedFiles.find(f => f.id === selectedIds[0]);
-            if (selected) {
-                if (selected.type === 'folder') setActiveFolderId(selected.id);
-                else handlePreview(selected, displayedFiles);
-            }
-        }
-    }, [selectedIds, displayedFiles, setActiveFolderId]);
+    // Keyboard handlers available for future shortcuts
 
     useKeyboardShortcuts({
         onSelectAll: handleSelectAll,
